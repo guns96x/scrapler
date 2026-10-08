@@ -252,7 +252,18 @@ def _extract_non_html(body: bytes, content_type: str) -> Optional[str]:
     """Return text for plain/JSON/XML/PDF documents, or None when the type is unsupported."""
     ct = content_type.lower()
     if any(t in ct for t in ("text/plain", "json", "text/markdown", "text/csv", "xml")) and "html" not in ct:
-        return body.decode("utf-8", "replace")
+        # Honor declared charset (e.g. text/plain; charset=windows-1251) before falling back to UTF-8
+        charset = "utf-8"
+        m = re.search(r"charset\s*=\s*['\"]?([\w\-]+)", content_type, re.IGNORECASE)
+        if m:
+            charset = m.group(1).strip()
+        try:
+            return body.decode(charset)
+        except (LookupError, UnicodeDecodeError):
+            try:
+                return body.decode("utf-8")
+            except UnicodeDecodeError:
+                return body.decode("utf-8", "replace")
     if "pdf" in ct:
         try:
             from pypdf import PdfReader

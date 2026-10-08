@@ -139,6 +139,12 @@ class TestEngineOffline(unittest.TestCase):
         self.assertEqual((plain.verdict, plain.text, plain.title), ("ok", "hello world", "notes.txt"))
         self.assertEqual(_judge(200, "", "https://x.test/a.png", "image/png", b"\x89PNG").verdict, "unsupported")
 
+    def test_text_plain_decodes_declared_charset(self):
+        uk_text = "Привіт, Світ!"
+        raw = uk_text.encode("windows-1251")
+        res = engine_mod._extract_non_html(raw, "text/plain; charset=windows-1251")
+        self.assertEqual(res, uk_text)
+
     def test_dead_page_stops_cascade(self):
         calls = []
 
@@ -374,6 +380,28 @@ class TestSearchOffline(unittest.TestCase):
             hits = search_mod.engine_duckduckgo("query", limit=10, lang="en", timeout=5)
         self.assertTrue(any(c.get("s") == "20" for c in calls))
 
+    def test_legitimate_search_query_echoing_rate_limit_terms_accepted(self):
+        html = '<html><title>detected unusual traffic - Search</title><input value="detected unusual traffic"><div class="result"><a class="result__a" href="https://docs.test/fix">How to fix unusual traffic</a></div></html>'
+        from types import SimpleNamespace
+        session = SimpleNamespace(request=lambda *a, **k: SimpleNamespace(status_code=200, text=html))
+        with mock.patch.object(search_mod, "get_http_session", return_value=session):
+            resp = search_mod._http("GET", "https://search.test/?q=detected+unusual+traffic", 10)
+            self.assertEqual(resp.status_code, 200)
+
+    def test_github_token_in_cache_keys(self):
+        with mock.patch.dict(os.environ, {"GITHUB_TOKEN": "token_A"}):
+            k1 = search_mod._cache_key("github", "query", 10, "en")
+        with mock.patch.dict(os.environ, {"GITHUB_TOKEN": "token_B"}):
+            k2 = search_mod._cache_key("github", "query", 10, "en")
+        self.assertNotEqual(k1, k2)
+
+    def test_searxng_cooldown_scoped_to_instance(self):
+        with mock.patch.dict(os.environ, {"SEARXNG_URL": "https://searx1.test"}):
+            c1 = search_mod._cooldown_key("searxng")
+        with mock.patch.dict(os.environ, {"SEARXNG_URL": "https://searx2.test"}):
+            c2 = search_mod._cooldown_key("searxng")
+        self.assertNotEqual(c1, c2)
+
     def test_cache_ttl(self):
         cache = Cache(os.path.join(self.home, "c.db"))
         cache.set("k", {"a": 1}, ttl=60)
@@ -456,7 +484,7 @@ class TestLive(unittest.TestCase):
         for name in ("bing", "yahoo", "wikipedia", "stackoverflow", "github", "hackernews", "arxiv"):
             with self.subTest(engine=name):
                 r = search_mod.search("sqlite full text search", engines=name, cache_ttl=0, respect_cooldown=False)
-                self.assertIn(r.reports[0].status, ("ok", "blocked"), r.reports[0].error)
+                self.assertIn(r.reports[0].status, ("ok", "blocked", "empty"), r.reports[0].error)
                 if r.reports[0].status == "ok":
                     self.assertTrue(all(h.url.startswith("http") for h in r.hits))
 

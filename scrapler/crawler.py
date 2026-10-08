@@ -115,6 +115,9 @@ def crawl_site(
             scraped_items.append(item)
             yield {"url": item.url, "title": item.title, "status": item.status}
 
+            # When the page redirects (e.g. apex to www, or http to https), associate
+            # the landing URL with scheduled_urls so links pointing back to it don't re-schedule it.
+            scheduled_urls.add(key(cur_url))
             if len(scraped_items) == 1:
                 # The start URL may redirect (http -> https, apex -> www): follow that host too.
                 allowed.add(urllib.parse.urlsplit(resp_url).netloc.lower())

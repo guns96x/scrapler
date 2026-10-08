@@ -197,7 +197,11 @@ def _http(method: str, url: str, timeout: float, api: bool = False, fresh: bool 
     body = response.text
     if response.status_code in (403, 429, 503) or (not api and is_challenge_or_blocked(response.status_code, body)):
         raise EngineBlocked(f"HTTP {response.status_code}")
-    if not api and (response.status_code == 202 or re.search(r"detected unusual traffic|/sorry/index|anomaly-modal|id=[\"']anomaly|class=[\"']anomaly", body[:30000], re.I)):
+    has_results = bool(re.search(r"class=[\"'](result|b_algo|dd algo|algo\b|g[\"\s])", body[:50000]))
+    if not api and not has_results and (
+        response.status_code == 202
+        or re.search(r"/sorry/index|id=[\"']anomaly|class=[\"']anomaly|id=[\"']infoDiv|class=[\"']g-recaptcha", body[:30000], re.I)
+    ):
         raise EngineBlocked(f"rate limited (HTTP {response.status_code})")
     if response.status_code >= 400:
         raise RuntimeError(f"HTTP {response.status_code}")
@@ -590,7 +594,18 @@ def _engine_config_fingerprint(engine: str) -> str:
         return os.environ.get("SEARXNG_URL", "").rstrip("/")
     if engine == "brave":
         return os.environ.get("BRAVE_API_KEY", "")[:8]
+    if engine == "github":
+        tok = os.environ.get("GITHUB_TOKEN", "")
+        return hashlib.sha1(tok.encode()).hexdigest()[:12] if tok else "anon"
     return ""
+
+
+def _cooldown_key(engine: str) -> str:
+    cfg = _engine_config_fingerprint(engine)
+    if cfg:
+        h = hashlib.sha1(cfg.encode("utf-8")).hexdigest()[:10]
+        return f"cooldown:{engine}:{h}"
+    return f"cooldown:{engine}"
 
 
 def _cache_key(engine: str, query: str, limit: int, lang: str) -> str:
@@ -622,7 +637,7 @@ def _run_engine(name: str, query: str, limit: int, lang: str, timeout: float,
             return hits, EngineReport(name, "cached", len(hits), round(time.time() - started, 3))
 
     if cache is not None and respect_cooldown:
-        until = cache.get(f"cooldown:{name}")
+        until = cache.get(_cooldown_key(name))
         if until:
             wait = int(until - time.time())
             return [], EngineReport(name, "cooldown", error=f"blocked recently, retry in {max(wait, 0)}s")
@@ -631,7 +646,7 @@ def _run_engine(name: str, query: str, limit: int, lang: str, timeout: float,
         hits = engine.fn(query, limit, lang, timeout)
     except EngineBlocked as e:
         if cache is not None:
-            cache.set(f"cooldown:{name}", time.time() + COOLDOWN_SECONDS, COOLDOWN_SECONDS)
+            cache.set(_cooldown_key(name), time.time() + COOLDOWN_SECONDS, COOLDOWN_SECONDS)
         return [], EngineReport(name, "blocked", 0, round(time.time() - started, 3), str(e))
     except Exception as e:
         return [], EngineReport(name, "error", 0, round(time.time() - started, 3), f"{type(e).__name__}: {e}"[:200])
