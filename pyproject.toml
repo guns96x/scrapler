@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scrapler"
-version = "0.2.0"
-description = "A 4-tier intelligent web scraping, recursive crawling, and hybrid vector retrieval engine"
+version = "0.3.0"
+description = "A 4-tier web scraping, recursive crawling, multi-engine meta search and hybrid vector retrieval engine"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
@@ -16,11 +16,15 @@ dependencies = [
     "scrapling[all]>=0.3.10",
     "patchright>=1.49.0",
     "beautifulsoup4>=4.12.0",
-    "requests>=2.31.0",
-    "duckduckgo-search>=8.0.0",
+    "lxml>=5.0.0",
+    "trafilatura>=2.0.0",
+    "pypdf>=4.0.0",
     "sqlite-vec>=0.1.6",
     "fastembed>=0.4.3"
 ]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
 
 [project.scripts]
 scrapler = "scrapler.cli:main"

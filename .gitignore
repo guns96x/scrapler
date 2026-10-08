@@ -46,3 +46,16 @@ virazh_decompiled/
 # OS artifacts
 .DS_Store
 Thumbs.db
+
+# Test & Scrape artifacts (PDFs, images, ad-hoc research dumps)
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.json
+*.txt
+order140_*.md
+bor_*.md
+tres_metros_trend/
+

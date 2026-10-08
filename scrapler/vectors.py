@@ -15,11 +15,17 @@ _model_instance = None
 
 
 def get_embedding_model():
-    """Lazy-load the FastEmbed multilingual embedding model."""
+    """
+    Lazy-load the FastEmbed multilingual embedding model.
+
+    Pinned to the CPU provider: otherwise onnxruntime probes CUDA on every load and
+    fails noisily when the CUDA/cuDNN DLLs are missing. Set SCRAPLER_USE_CUDA=1 to opt in.
+    """
     global _model_instance
     if _model_instance is None:
         from fastembed import TextEmbedding
-        _model_instance = TextEmbedding(EMBEDDING_MODEL_NAME)
+        providers = None if os.environ.get("SCRAPLER_USE_CUDA") == "1" else ["CPUExecutionProvider"]
+        _model_instance = TextEmbedding(EMBEDDING_MODEL_NAME, providers=providers)
     return _model_instance
 
 
@@ -69,18 +75,18 @@ class VectorStore:
 
         model = get_embedding_model()
         texts = [it["text"] for it in valid]
-        embeddings = [list(e) for e in model.embed(texts)]
+        rows = [
+            (it["id"], it.get("project", "default"), serialize_vector(list(emb)))
+            for it, emb in zip(valid, model.embed(texts, batch_size=64))
+        ]
 
         with self.get_connection() as con:
-            cur = con.cursor()
-            for it, emb in zip(valid, embeddings):
-                chunk_id = it["id"]
-                project = it.get("project", "default")
-                serialized = serialize_vector(emb)
-                cur.execute("""
-                    INSERT OR REPLACE INTO vec_chunks(chunk_id, project, embedding)
-                    VALUES (?, ?, ?)
-                """, (chunk_id, project, serialized))
+            # vec0 has no UPSERT: delete then insert so re-indexing a chunk replaces it.
+            con.executemany("DELETE FROM vec_chunks WHERE chunk_id = ?", [(r[0],) for r in rows])
+            con.executemany(
+                "INSERT INTO vec_chunks(chunk_id, project, embedding) VALUES (?, ?, ?)",
+                rows,
+            )
             con.commit()
         return len(valid)
 
@@ -123,13 +129,19 @@ class HybridRetriever:
         Reciprocal Rank Fusion (RRF):
         score(d) = sum(1 / (k + rank_i(d)))
         """
-        scores: Dict[int, float] = {}
+        return HybridRetriever.fuse([fts_ranks, vec_ranks], k=k, limit=limit)
 
-        for rank, cid in enumerate(fts_ranks):
-            scores[cid] = scores.get(cid, 0.0) + (1.0 / (k + (rank + 1)))
-
-        for rank, cid in enumerate(vec_ranks):
-            scores[cid] = scores.get(cid, 0.0) + (1.0 / (k + (rank + 1)))
-
-        sorted_items = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        return sorted_items[:limit]
+    @staticmethod
+    def fuse(
+        rankings: List[List[Any]],
+        k: int = 60,
+        limit: int = 10,
+        weights: Optional[List[float]] = None,
+    ) -> List[Tuple[Any, float]]:
+        """Weighted RRF over any number of ranked id lists."""
+        scores: Dict[Any, float] = {}
+        for i, ranking in enumerate(rankings):
+            w = weights[i] if weights else 1.0
+            for rank, cid in enumerate(ranking, 1):
+                scores[cid] = scores.get(cid, 0.0) + w / (k + rank)
+        return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:limit]
