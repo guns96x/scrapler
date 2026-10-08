@@ -1,0 +1,11 @@
+# Core HTTP & Scraping
+curl_cffi>=0.7.4
+scrapling[all]>=0.3.10
+patchright>=1.49.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+duckduckgo-search>=8.0.0
+
+# Vector Embeddings & Hybrid Search
+sqlite-vec>=0.1.6
+fastembed>=0.4.3
