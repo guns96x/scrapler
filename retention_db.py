@@ -105,9 +105,9 @@ CULTURES_SEED = [
 
 MECHANISMS_SEED = [
     ("curiosity_gap", "Information Gap (Loewenstein)", "curiosity", "Brain treats missing information as physical discomfort/itch that must be scratched.", "High initial click/stop rate; high dropoff if answer is anticlimactic.", "Do not use when viewer expects an immediate tutorial or fast utility."),
-    ("loss_aversion", "Loss Aversion (Kahneman & Tversky)", "loss_aversion", "Evolutionary fear of losing resources/status is 2.5x stronger than desire to gain.", "Can provoke anxiety; audience fatigue if overused.", "Do not use for lighthearted entertainment or whimsical comedy."),
+    ("loss_aversion", "Loss Aversion (Kahneman & Tversky)", "loss_aversion", "Losses weigh roughly twice as much as equal gains in classic estimates (Tversky & Kahneman 1992, lambda ~2.25); later estimates vary.", "Can provoke anxiety; audience fatigue if overused.", "Do not use for lighthearted entertainment or whimsical comedy."),
     ("status_reversal", "Status Inversion (Shuangdian / Dalian)", "status_reversal", "Deep emotional catharsis when an arrogant oppressor is humbled by an undercover hero.", "Can feel overly melodramatic or unrealistic if ungrounded.", "Avoid in strictly professional B2B or scholarly content."),
-    ("pattern_break", "Sensory Anomaly / RAS Interrupt", "pattern_break", "Reticular Activating System filters 99% of stimuli; unexpected anomalies force conscious attention.", "Transient attention only (0.5s); requires immediate narrative support.", "Avoid chaotic strobe cuts that cause cognitive nausea."),
+    ("pattern_break", "Sensory Anomaly / RAS Interrupt", "pattern_break", "Cuts, zooms and sudden sounds trigger an orienting response; surprise (a shift in expectations, not mere rarity) draws gaze (Itti & Baldi 2009).", "Transient attention only (0.5s); requires immediate narrative support.", "Avoid chaotic strobe cuts that cause cognitive nausea."),
     ("dramatic_irony", "Dramatic Irony (Hitchcock Bomb)", "dramatic_irony", "Viewer knows a critical secret that characters in the scene are completely oblivious to.", "Builds sustained agonizing suspense without needing fast cuts.", "Do not use when the surprise twist itself is the only selling point.")
 ]
 
@@ -177,7 +177,7 @@ HOOKS_SEED = [
      "Retention Sentinel, Escalation Ladder, Ticking Clock",
      "Wide drone shot showing massive scale, timer graphic on screen, contestant jumping immediately.",
      "High-tempo orchestral percussion, immediate enthusiastic voice-over starting at 00:00:00.",
-     "0.0 - 3.0s", "retention commitment (VVSA > 85%)", "Promise must be completely genuine and delivered in full."),
+     "0.0 - 3.0s", "retention commitment", "Promise must be completely genuine and delivered in full."),
 
     ("us_brainrot_01", "pattern_break", "usa", "Dual-Hemisphere Sensory Lock", "Split-Screen Hypnotic Bait", "shorts", "passive trance / sensory saturation",
      "[Top: Compelling Story / Bottom: Flawless Kinetic Gameplay]",
@@ -198,7 +198,7 @@ HOOKS_SEED = [
      "Zero background music; natural ambient field recording (bird chirps, dry leaves rustling).",
      "0.0 - 4.0s", "hypnotic scroll freeze through auditory contrast", "Requires flawless vocal tone and sophisticated vocabulary."),
 
-    ("eu_kuleshov_01", "dramatic_irony", "europe", "Associative Mental Collision", "French Cinema Kuleshov Montage", "shorts", "analytical curiosity",
+    ("eu_kuleshov_01", "dramatic_irony", "europe", "Associative Mental Collision", "Kuleshov Montage (Soviet school)", "shorts", "analytical curiosity",
      "[Neutral Face Expression] + [Violent or Erotic Stimulus] = Derived Complex Emotion",
      "[Neutral staring protagonist] cut to [Sinking luxury yacht] cut back to [Protagonist's slight smile]",
      "[Нейтральний погляд героя] склейка [Палаючий контракт на мільйон] склейка [Герой робить ковток кави]",
@@ -235,13 +235,13 @@ HOOKS_SEED = [
      "Aussie Outback, Deadpan Delivery, Lethal Wildlife",
      "Vertical handheld camera, raw natural lighting, creature moving menacingly close to lens.",
      "Complete lack of dramatic music; casual laid-back Australian speaking voice.",
-     "0.0 - 2.0s", "instinctive biological fear lock (Amygdala)", "Must be authentic; staged creatures look fake instantly."),
+     "0.0 - 2.0s", "fear / curiosity", "Must be authentic; staged creatures look fake instantly."),
 
     # Expanded Universal & Cultural Hooks
     ("gen_contrarian_01", "pattern_break", "usa", "Myth Demolition / Stop Doing This", "The Contrarian Take", "shorts", "cognitive dissonance / curiosity",
      "Stop [Common Activity] like this. You are literally burning [Valuable Resource]...",
-     "Stop drinking a gallon of water every morning. You are literally flushing out your vital electrolytes...",
-     "Припиніть вливати в себе по 2 літри води щоранку. Ви буквально вимиваєте життєво необхідні електроліти...",
+     "Most people think coffee gives you energy. It doesn't - it just hides the signal that you're tired...",
+     "Більшість думає, що кава дає енергію. Ні - вона лише блокує сигнал втоми...",
      "Myth Buster, Contrarian, Dopamine Reset",
      "Fast hand gesture waving 'NO' in front of camera lens, big red cross icon over common item.",
      "Record scratch sound effect or buzzer, vocal pace energetic and confident.",
@@ -311,25 +311,25 @@ HOOKS_SEED = [
      "0.0 - 3.5s", "atmospheric trance & anxiety lock", "Does not fit fast-paced meme accounts."),
 
     ("universal_loop_01", "curiosity_gap", "usa", "The Infinite Sentence Möbius Loop", "Seamless Loop Engine", "shorts", "endless curiosity / algorithmic rewatch",
-     "Ending sentence matches the opening sentence grammar perfectly to trap viewer in a 200% rewatch loop.",
-     "Ending line: '...and that is why the most dangerous thing you can do when waking up is...' -> Opening line: '...hitting the snooze button three times in a row!'",
-     "Фінальна репліка: '...і саме тому найнебезпечніше, що ви можете зробити зранку — це...' -> Початок: '...натиснути кнопку повтору будильника тричі поспіль!'",
+     "Ending sentence flows grammatically into the opening sentence, so a rewatch starts seamlessly.",
+     "Ending line: '...and that's because caffeine doesn't actually...' -> Opening line: '...give you energy - it hides the signal that you're tired!'",
+     "Фінальна репліка: '...а все тому, що кофеїн насправді...' -> Початок: '...не додає енергії, а лише блокує сигнал втоми!'",
      "Seamless Loop, Infinite Retention, Sentence Bridge",
      "Exact match cut: narrator's hand position, head tilt, and room lighting are identical at T_end and T_0.",
      "Continuous background beat that wraps seamlessly across frame 0 without beat disruption.",
-     "Final 2s -> 0.0s", "elevates APVD from 75% to 140%+", "Loop sentence must make complete logical sense in both directions.")
+     "Final 2s -> 0.0s", "seamless rewatch (no source shows loops lift distribution)", "Loop sentence must make complete logical sense in both directions.")
 ]
 
 FRAMEWORKS_SEED = [
-    ("fw_wedge", "usa", "WEDGE Short-Form Engine", "US Creator Economy (Jenny Hoyos / MrBeast)", "30-50s",
+    ("fw_wedge", "usa", "WEDGE Short-Form Engine", "Synthesis of US creator advice (not a named method of any creator)", "30-50s",
      json.dumps([
          {"step": "W (Wedge)", "time": "0-3s", "goal": "Sharp stop-the-scroll assertion or visual anomaly."},
          {"step": "E (Escalation)", "time": "3-15s", "goal": "Rapid progression toward goal while hitting obstacle 1."},
-         {"step": "D (Dilemma/Cliff)", "time": "15-25s", "goal": "15s pattern interrupt: game-changing twist or stakes shift."},
+         {"step": "D (Dilemma/Turn)", "time": "where your own retention curve dips", "goal": "Twist or stakes shift; there is no universal 15s cliff."},
          {"step": "G (Gold/Payoff)", "time": "25-45s", "goal": "Genuine, explosive fulfillment of the opening promise."},
          {"step": "E (End-Early)", "time": "Final second", "goal": "Zero goodbye filler; hard cut on peak word for seamless loop."}
      ]),
-     "High initial retention, minimal dropoff at 15s cliff, APVD > 85%",
+     "Hypothesis: measure on your own retention curve",
      "Educational, viral life-hacks, challenge Shorts"),
 
     ("fw_duanju_shuangdian", "china", "Duanju Shuangdian Loop", "Chinese Vertical Drama (ReelShort / Kuaishou)", "60-90s",
@@ -340,7 +340,7 @@ FRAMEWORKS_SEED = [
          {"step": "Dalian (Face-Slap)", "time": "45-65s", "goal": "Total status inversion; antagonist falls to knees begging."},
          {"step": "Monetization Cliffhanger", "time": "65-75s", "goal": "Deadly secret phone call or emergency that forces next episode purchase."}
      ]),
-     "Extreme emotional volatility, near 90% completion rate for drama lovers",
+     "Extreme emotional volatility; completion figures unsourced",
      "Micro-dramas, fiction, narrative reels"),
 
     ("fw_kishotenketsu", "japan", "Kishōtenketsu 4-Act Balance", "Japanese Classical Literature & Manga", "20-40s",
@@ -350,7 +350,7 @@ FRAMEWORKS_SEED = [
          {"step": "Ten (転 - Twist)", "time": "15-28s", "goal": "Introduce sudden, completely orthogonal element that reframes context."},
          {"step": "Ketsu (結 - Synthesis)", "time": "28-35s", "goal": "Synthesize the two worlds together into witty or profound closure."}
      ]),
-     "Gentle curve, high satisfaction score, elevated rewatch count",
+     "Hypothesis: gentle curve; not measured",
      "Visual storytelling, animation, artistic humor, cooking")
 ]
 
@@ -358,6 +358,10 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.executescript(SCHEMA)
+
+    # Seeds are the source of truth: drop rows whose ids were removed from them
+    for table in ("hooks", "frameworks", "mechanisms", "cultures"):
+        cursor.execute(f"DELETE FROM {table}")
 
     # Insert Cultures
     cursor.executemany("INSERT OR REPLACE INTO cultures VALUES (?,?,?,?,?,?)", CULTURES_SEED)
@@ -517,8 +521,8 @@ def generate_blueprint(topic: str, culture: str = "usa", duration: str = "45s") 
         out.append(f"      👉 Target Goal: {step['goal']}")
 
     out.append(f"\n⚡ RETENTION SENTINEL REMINDER:")
-    out.append(f"   - Keep cut intervals strictly between 1.5 - 2.0s.")
-    out.append(f"   - Force a Pattern Interrupt on second 14-15.")
+    out.append(f"   - Cut where the action changes; no source sets a 1.5-2.0s cut rhythm.")
+    out.append(f"   - Put the twist where your own retention curve dips; there is no universal 15s cliff.")
     out.append(f"   - End strictly on peak word (Zero goodbye words).")
     return "\n".join(out)
 
@@ -539,6 +543,11 @@ def print_hook_card(h: Dict[str, Any]):
     print(f"{'='*75}")
 
 def main():
+    # Windows consoles default to cp1251/cp866, which cannot encode the emoji and CJK output
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(description="Worldwide Viewer Retention & Storytelling Knowledge Base CLI")
     parser.add_argument("-q", "--query", help="Search query (full text, trigram, or original terms like 打脸)")
     parser.add_argument("-r", "--region", help="Filter by culture/region (china, japan, korea, usa, europe, latam, india, australia)")
