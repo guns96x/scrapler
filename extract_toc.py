@@ -43,6 +43,7 @@ def fetch_page(page: int, retries: int = 5) -> list[dict]:
 def main():
     all_chapters = {}
     print(f"Fetching {TOTAL_PAGES} TOC pages...")
+    failed_pages = []
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {executor.submit(fetch_page, p): p for p in range(1, TOTAL_PAGES + 1)}
         for f in as_completed(futures):
@@ -54,6 +55,11 @@ def main():
                     all_chapters[cid] = c
             except Exception as e:
                 print(f"Fatal error on page {page_num}: {e}")
+                failed_pages.append(page_num)
+
+    if failed_pages:
+        print(f"ABORT: {len(failed_pages)} pages failed: {failed_pages}. TOC file NOT overwritten.")
+        return
 
     # Convert to list and sort
     chapter_list = list(all_chapters.values())
