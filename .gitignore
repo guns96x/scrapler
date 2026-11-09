@@ -59,3 +59,7 @@ order140_*.md
 bor_*.md
 tres_metros_trend/
 
+
+*.jsonl
+chapters_cache/
+chapters_toc.json
